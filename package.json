@@ -6,7 +6,11 @@
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "prebuild:staging": "ENVIRONMENT=staging expo prebuild --clean",
+    "prebuild:prod": "ENVIRONMENT=production expo prebuild --clean",
+    "run:staging": "ENVIRONMENT=staging expo run:android",
+    "run:prod": "ENVIRONMENT=production expo run:android"
   },
   "dependencies": {
     "expo": "~54.0.30",
@@ -15,5 +19,10 @@
     "react-native": "0.81.5",
     "react-native-config": "^1.6.1"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/react-native-dotenv": "^0.2.2",
+    "babel-preset-expo": "^54.0.9",
+    "react-native-dotenv": "^3.4.11"
+  }
 }

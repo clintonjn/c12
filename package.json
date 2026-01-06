@@ -7,9 +7,13 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "prebuild:dev": "ENVIRONMENT=dev expo prebuild --clean",
     "prebuild:staging": "ENVIRONMENT=staging expo prebuild --clean",
+    "prebuild:preprod": "ENVIRONMENT=preproduction expo prebuild --clean",
     "prebuild:prod": "ENVIRONMENT=production expo prebuild --clean",
+    "run:dev": "ENVIRONMENT=dev expo run:android",
     "run:staging": "ENVIRONMENT=staging expo run:android",
+    "run:preprod": "ENVIRONMENT=preproduction expo run:android",
     "run:prod": "ENVIRONMENT=production expo run:android"
   },
   "dependencies": {

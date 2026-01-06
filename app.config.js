@@ -72,11 +72,12 @@ export default {
     android: {
       package: getPackageId(),
 
-      // Current: Adaptive icon with colored background
+      // Use adaptive icon with padded foreground for colored backgrounds
       adaptiveIcon: {
-        foregroundImage: './assets/mobile-development.png',
+        foregroundImage: './assets/mobile-development-padded.png',
         backgroundColor: getIconColor(),
       },
+
       // Alternative: Different icons per environment
       // icon: getIcon(),
     },

@@ -1,7 +1,7 @@
 import { fontFamilies } from '../constants/fonts';
 
 export const getFontFamily = (
-  fontType: 'UBUNTU_MONO' = 'UBUNTU_MONO',
+  fontType: 'UBUNTU_MONO' | 'GRUPPO' = 'UBUNTU_MONO',
   weight: 'regular' | 'bold' | 'italic' | 'boldItalic' = 'regular'
 ) => {
   const selectedFontFamily = fontFamilies[fontType];

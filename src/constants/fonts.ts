@@ -7,4 +7,7 @@ export const fontFamilies = {
     italic: isIOS() ? 'Ubuntu Mono' : 'UbuntuMono-Italic',
     boldItalic: isIOS() ? 'Ubuntu Mono' : 'UbuntuMono-BoldItalic',
   },
+  GRUPPO: {
+    regular: isIOS() ? 'Gruppo-Regular' : 'GruppoRegular',
+  },
 };

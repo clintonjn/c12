@@ -14,7 +14,21 @@
     "run:dev": "ENVIRONMENT=dev expo run:android",
     "run:staging": "ENVIRONMENT=staging expo run:android",
     "run:preprod": "ENVIRONMENT=preproduction expo run:android",
-    "run:prod": "ENVIRONMENT=production expo run:android"
+    "run:prod": "ENVIRONMENT=production expo run:android",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "expo": "~54.0.30",
@@ -25,8 +39,19 @@
   },
   "private": true,
   "devDependencies": {
+    "@react-native/eslint-config": "^0.83.1",
     "@types/react-native-dotenv": "^0.2.2",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
     "babel-preset-expo": "^54.0.9",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-ft-flow": "^3.0.11",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-native": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
     "react-native-dotenv": "^3.4.11"
   }
 }

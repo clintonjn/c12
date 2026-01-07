@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import AuthService from '../services/AuthService';
 
@@ -27,6 +28,7 @@ const Registration = ({
     password: '',
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -95,6 +97,7 @@ const Registration = ({
             value={formData.firstName}
             onChangeText={value => handleInputChange('firstName', value)}
             placeholderTextColor="#999"
+            selectionColor="#333"
           />
 
           <TextInput
@@ -103,6 +106,7 @@ const Registration = ({
             value={formData.lastName}
             onChangeText={value => handleInputChange('lastName', value)}
             placeholderTextColor="#999"
+            selectionColor="#333"
           />
 
           <TextInput
@@ -112,6 +116,7 @@ const Registration = ({
             onChangeText={value => handleInputChange('phoneNumber', value)}
             keyboardType="phone-pad"
             placeholderTextColor="#999"
+            selectionColor="#333"
           />
 
           <TextInput
@@ -122,16 +127,36 @@ const Registration = ({
             keyboardType="email-address"
             autoCapitalize="none"
             placeholderTextColor="#999"
+            selectionColor="#333"
           />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={formData.password}
-            onChangeText={value => handleInputChange('password', value)}
-            secureTextEntry
-            placeholderTextColor="#999"
-          />
+          {/* Password Field with Eye Button */}
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Password"
+              value={formData.password}
+              onChangeText={value => handleInputChange('password', value)}
+              secureTextEntry={!showPassword}
+              textContentType="password"
+              placeholderTextColor="#999"
+              selectionColor="#333"
+            />
+            <TouchableOpacity
+              style={styles.eyeButton}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Image
+                source={
+                  showPassword
+                    ? require('../assets/icons/hide.png')
+                    : require('../assets/icons/view.png')
+                }
+                style={styles.eyeIcon}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
 
           {/* Register Button */}
           <TouchableOpacity
@@ -229,6 +254,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Ubuntu Mono',
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 16,
+    fontSize: 16,
+    fontFamily: 'Ubuntu Mono',
+    color: '#333',
+  },
+  eyeButton: {
+    padding: 16,
+  },
+  eyeIcon: {
+    width: 20,
+    height: 20,
+    tintColor: '#666',
   },
   registerButton: {
     backgroundColor: '#333',

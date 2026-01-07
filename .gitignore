@@ -28,6 +28,9 @@ ios/
 google-services.json
 GoogleService-Info.plist
 
+# Project artifacts
+rn-c12
+
 # Metro
 .metro-health-check*
 

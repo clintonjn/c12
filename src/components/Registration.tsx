@@ -10,6 +10,7 @@ import {
   Image,
 } from 'react-native';
 import AuthService from '../services/AuthService';
+import GoogleAuthService from '../services/GoogleAuthService';
 
 interface RegistrationProps {
   onRegistrationComplete: () => void;
@@ -69,10 +70,21 @@ const Registration = ({
     }
   };
 
-  const handleGoogleRegister = () => {
-    // TODO: Implement actual Google Sign-In
-    // For now, simulate successful Google registration
-    onRegistrationComplete();
+  const handleGoogleRegister = async () => {
+    setLoading(true);
+    const result = await GoogleAuthService.signIn();
+    setLoading(false);
+
+    if (result.success) {
+      // Google Sign-In successful, navigate to welcome screen
+      onRegistrationComplete();
+    } else if (!('cancelled' in result)) {
+      // Only show error if it wasn't cancelled
+      Alert.alert(
+        'Google Sign-In Failed',
+        'error' in result ? result.error : 'Unknown error'
+      );
+    }
   };
 
   return (

@@ -34,6 +34,7 @@
     "@react-native-firebase/app": "^23.7.0",
     "@react-native-firebase/auth": "^23.7.0",
     "@react-native-firebase/firestore": "^23.7.0",
+    "@react-native-google-signin/google-signin": "^16.1.1",
     "expo": "~54.0.30",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",

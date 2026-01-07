@@ -10,6 +10,7 @@ import {
   Image,
 } from 'react-native';
 import AuthService from '../services/AuthService';
+import GoogleAuthService from '../services/GoogleAuthService';
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -48,6 +49,22 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }: LoginProps) => {
       onLoginSuccess();
     } else {
       Alert.alert('Login Failed', result.error);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    const result = await GoogleAuthService.signIn();
+    setLoading(false);
+
+    if (result.success) {
+      onLoginSuccess();
+    } else if (!('cancelled' in result)) {
+      // Only show error if it wasn't cancelled
+      Alert.alert(
+        'Google Sign-In Failed',
+        'error' in result ? result.error : 'Unknown error'
+      );
     }
   };
 
@@ -115,6 +132,22 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }: LoginProps) => {
             <Text style={styles.loginButtonText}>
               {loading ? 'Signing In...' : 'Sign In'}
             </Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.divider} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.divider} />
+          </View>
+
+          {/* Google Sign-In Button */}
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={handleGoogleSignIn}
+            disabled={loading}
+          >
+            <Text style={styles.googleButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
           {/* Switch to Register */}
@@ -239,6 +272,37 @@ const styles = StyleSheet.create({
   },
   switchLink: {
     color: '#333',
+    fontWeight: 'bold',
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ddd',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    fontFamily: 'Ubuntu Mono',
+    color: '#999',
+  },
+  googleButton: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 24,
+  },
+  googleButtonText: {
+    color: '#333',
+    fontSize: 16,
+    fontFamily: 'Ubuntu Mono',
     fontWeight: 'bold',
   },
 });

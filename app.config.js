@@ -64,7 +64,10 @@ export default {
     slug: 'c12',
     version: '1.0.0',
 
-    plugins: ['./plugins/withFirebaseAndroid'],
+    plugins: [
+      './plugins/withFirebaseAndroid',
+      '@react-native-google-signin/google-signin',
+    ],
 
     // Current: Same icon with colored backgrounds
     icon: './src/assets/icons/mobile-development.png',

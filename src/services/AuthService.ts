@@ -1,5 +1,6 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export interface UserData {
   firstName: string;
@@ -62,6 +63,14 @@ class AuthService {
   async logoutUser() {
     try {
       await auth().signOut();
+
+      // Also sign out from Google to allow account selection next time
+      try {
+        await GoogleSignin.signOut();
+      } catch {
+        // User may not be signed in with Google
+      }
+
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -74,7 +83,7 @@ class AuthService {
   }
 
   // Listen to auth state changes
-  onAuthStateChanged(callback: (user: any) => void) {
+  onAuthStateChanged(callback: (user: unknown) => void) {
     return auth().onAuthStateChanged(callback);
   }
 

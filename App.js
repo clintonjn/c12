@@ -29,6 +29,11 @@ export default function App() {
     setIsAuthenticated(true);
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowLogin(true); // Show login screen after logout
+  };
+
   const handleSwitchToLogin = () => {
     setShowLogin(true);
   };
@@ -44,7 +49,7 @@ export default function App() {
   if (isAuthenticated) {
     return (
       <View style={styles.container}>
-        <Welcome />
+        <Welcome onLogout={handleLogout} />
         <StatusBar style="auto" />
       </View>
     );

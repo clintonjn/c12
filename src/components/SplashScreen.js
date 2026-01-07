@@ -24,7 +24,7 @@ const SplashScreen = ({ onFinish }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/mobile-development-padded.png')}
+        source={require('../assets/icons/mobile-development-padded.png')}
         style={styles.logo}
         resizeMode="contain"
       />

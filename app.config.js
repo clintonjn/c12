@@ -67,7 +67,7 @@ export default {
     plugins: ['./plugins/withFirebaseAndroid'],
 
     // Current: Same icon with colored backgrounds
-    icon: './assets/mobile-development.png',
+    icon: './src/assets/icons/mobile-development.png',
     // Alternative: Different icons per environment
     // icon: getIcon(),
 
@@ -77,7 +77,7 @@ export default {
 
       // Use adaptive icon with padded foreground for colored backgrounds
       adaptiveIcon: {
-        foregroundImage: './assets/mobile-development-padded.png',
+        foregroundImage: './src/assets/icons/mobile-development-padded.png',
         backgroundColor: getIconColor(),
       },
 
@@ -88,7 +88,7 @@ export default {
       bundleIdentifier: getPackageId(),
 
       // Current: Same icon for iOS
-      icon: './assets/mobile-development.png',
+      icon: './src/assets/icons/mobile-development.png',
       // Alternative: Different icons per environment
       // icon: getIcon(),
     },

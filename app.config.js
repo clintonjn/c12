@@ -64,6 +64,8 @@ export default {
     slug: 'c12',
     version: '1.0.0',
 
+    plugins: ['./plugins/withFirebaseAndroid'],
+
     // Current: Same icon with colored backgrounds
     icon: './assets/mobile-development.png',
     // Alternative: Different icons per environment
@@ -71,6 +73,7 @@ export default {
 
     android: {
       package: getPackageId(),
+      googleServicesFile: './google-services.json',
 
       // Use adaptive icon with padded foreground for colored backgrounds
       adaptiveIcon: {

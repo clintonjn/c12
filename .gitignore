@@ -24,6 +24,10 @@ ios/
 # Q CLI todo lists
 .amazonq/
 
+# Firebase configuration files (contain sensitive keys)
+google-services.json
+GoogleService-Info.plist
+
 # Metro
 .metro-health-check*
 

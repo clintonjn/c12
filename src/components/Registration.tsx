@@ -6,15 +6,27 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from 'react-native';
+import AuthService from '../services/AuthService';
 
-const Registration = ({ onRegistrationComplete }) => {
+interface RegistrationProps {
+  onRegistrationComplete: () => void;
+  onSwitchToLogin: () => void;
+}
+
+const Registration = ({
+  onRegistrationComplete,
+  onSwitchToLogin,
+}: RegistrationProps) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
     email: '',
+    password: '',
   });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -23,18 +35,35 @@ const Registration = ({ onRegistrationComplete }) => {
     }));
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // Basic validation
     if (
       formData.firstName &&
       formData.lastName &&
       formData.phoneNumber &&
-      formData.email
+      formData.email &&
+      formData.password
     ) {
-      // Registration successful
-      onRegistrationComplete();
+      setLoading(true);
+      const result = await AuthService.registerUser(
+        formData.email,
+        formData.password,
+        {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+        }
+      );
+      setLoading(false);
+
+      if (result.success) {
+        onRegistrationComplete();
+      } else {
+        Alert.alert('Registration Failed', result.error);
+      }
     } else {
-      // TODO: Show error message for incomplete form
+      Alert.alert('Error', 'Please fill all fields');
     }
   };
 
@@ -95,12 +124,24 @@ const Registration = ({ onRegistrationComplete }) => {
             placeholderTextColor="#999"
           />
 
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={formData.password}
+            onChangeText={value => handleInputChange('password', value)}
+            secureTextEntry
+            placeholderTextColor="#999"
+          />
+
           {/* Register Button */}
           <TouchableOpacity
-            style={styles.registerButton}
+            style={[styles.registerButton, loading && styles.disabledButton]}
             onPress={handleRegister}
+            disabled={loading}
           >
-            <Text style={styles.registerButtonText}>Create Account</Text>
+            <Text style={styles.registerButtonText}>
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </Text>
           </TouchableOpacity>
 
           {/* Divider */}
@@ -116,6 +157,17 @@ const Registration = ({ onRegistrationComplete }) => {
             onPress={handleGoogleRegister}
           >
             <Text style={styles.googleButtonText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          {/* Switch to Login */}
+          <TouchableOpacity
+            style={styles.switchButton}
+            onPress={onSwitchToLogin}
+          >
+            <Text style={styles.switchText}>
+              Already have an account?{' '}
+              <Text style={styles.switchLink}>Sign In</Text>
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -220,6 +272,22 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 16,
     fontFamily: 'Ubuntu Mono',
+    fontWeight: 'bold',
+  },
+  disabledButton: {
+    backgroundColor: '#999',
+  },
+  switchButton: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  switchText: {
+    fontSize: 14,
+    fontFamily: 'Ubuntu Mono',
+    color: '#666',
+  },
+  switchLink: {
+    color: '#333',
     fontWeight: 'bold',
   },
 });

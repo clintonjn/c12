@@ -1,27 +1,47 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import SplashScreen from './src/components/SplashScreen';
 import Registration from './src/components/Registration';
+import Login from './src/components/Login';
 import Welcome from './src/components/Welcome';
+import AuthService from './src/services/AuthService';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLogin, setShowLogin] = useState(true);
+
+  useEffect(() => {
+    // Listen to authentication state changes
+    const unsubscribe = AuthService.onAuthStateChanged(user => {
+      setIsAuthenticated(!!user);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const handleSplashFinish = () => {
     setShowSplash(false);
   };
 
-  const handleRegistrationComplete = () => {
-    setIsRegistered(true);
+  const handleAuthSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleSwitchToLogin = () => {
+    setShowLogin(true);
+  };
+
+  const handleSwitchToRegister = () => {
+    setShowLogin(false);
   };
 
   if (showSplash) {
     return <SplashScreen onFinish={handleSplashFinish} />;
   }
 
-  if (isRegistered) {
+  if (isAuthenticated) {
     return (
       <View style={styles.container}>
         <Welcome />
@@ -32,7 +52,17 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Registration onRegistrationComplete={handleRegistrationComplete} />
+      {showLogin ? (
+        <Login
+          onLoginSuccess={handleAuthSuccess}
+          onSwitchToRegister={handleSwitchToRegister}
+        />
+      ) : (
+        <Registration
+          onRegistrationComplete={handleAuthSuccess}
+          onSwitchToLogin={handleSwitchToLogin}
+        />
+      )}
       <StatusBar style="auto" />
     </View>
   );

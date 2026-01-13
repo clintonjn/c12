@@ -29,7 +29,7 @@ const SplashScreen = ({ onFinish }) => {
         resizeMode="contain"
       />
       <Text style={styles.appName}>C12</Text>
-      <Text style={styles.tagline}>Hold Ticght Loading your app...</Text>
+      <Text style={styles.tagline}>Hold Tight Loading your app...</Text>
 
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,12 +9,37 @@ import {
 } from 'react-native';
 import { getFontFamily } from '../utils/fontFamily';
 import AuthService from '../services/AuthService';
+import firestore from '@react-native-firebase/firestore';
 
 interface WelcomeProps {
   onLogout: () => void;
+  user: unknown;
 }
 
-const Welcome = ({ onLogout }: WelcomeProps) => {
+const Welcome = ({ onLogout, user }: WelcomeProps) => {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userObj = user as { uid?: string };
+      if (userObj?.uid) {
+        try {
+          const userDoc = await firestore()
+            .collection('users')
+            .doc(userObj.uid)
+            .get();
+          if (userDoc.exists) {
+            setUserData(userDoc.data());
+          }
+        } catch {
+          // Error fetching user data
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
   const handleLogout = async () => {
     const result = await AuthService.logoutUser();
     if (result.success) {
@@ -24,8 +49,40 @@ const Welcome = ({ onLogout }: WelcomeProps) => {
     }
   };
 
+  // Get display name from Firestore user data
+  const getDisplayName = () => {
+    const userObj = user as { displayName?: string; email?: string };
+    const userDataObj = userData as {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+    } | null;
+
+    if (userDataObj?.firstName && userDataObj?.lastName) {
+      return `${userDataObj.firstName} ${userDataObj.lastName}`;
+    }
+    if (userDataObj?.firstName) {
+      return userDataObj.firstName;
+    }
+    if (userDataObj?.email) {
+      return userDataObj.email.split('@')[0];
+    }
+    if (userObj?.displayName) {
+      return userObj.displayName;
+    }
+    if (userObj?.email) {
+      return userObj.email.split('@')[0];
+    }
+    return 'User';
+  };
+
   return (
     <View style={styles.container}>
+      {/* Username in top left */}
+      <Text style={[styles.subtitle, styles.usernamePosition]}>
+        {getDisplayName()}
+      </Text>
+
       {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Image
@@ -64,6 +121,11 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     tintColor: '#fff', // Makes icon white
+  },
+  usernamePosition: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
   },
   welcome: {
     fontSize: 32,

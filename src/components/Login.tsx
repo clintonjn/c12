@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import AuthService from '../services/AuthService';
 import GoogleAuthService from '../services/GoogleAuthService';
+import CustomAlert from './CustomAlert';
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -24,6 +26,12 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }: LoginProps) => {
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [alert, setAlert] = useState({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'error' as 'error' | 'success' | 'info',
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -32,9 +40,21 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }: LoginProps) => {
     }));
   };
 
+  const showAlert = (
+    title: string,
+    message: string,
+    type: 'error' | 'success' | 'info' = 'error'
+  ) => {
+    setAlert({ visible: true, title, message, type });
+  };
+
+  const hideAlert = () => {
+    setAlert(prev => ({ ...prev, visible: false }));
+  };
+
   const handleLogin = async () => {
     if (!formData.email || !formData.password) {
-      Alert.alert('Error', 'Please fill all fields');
+      showAlert('Error', 'Please fill all fields');
       return;
     }
 
@@ -48,7 +68,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }: LoginProps) => {
     if (result.success) {
       onLoginSuccess();
     } else {
-      Alert.alert('Login Failed', result.error);
+      showAlert('Login Failed', result.error);
     }
   };
 
@@ -61,7 +81,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }: LoginProps) => {
       onLoginSuccess();
     } else if (!('cancelled' in result)) {
       // Only show error if it wasn't cancelled
-      Alert.alert(
+      showAlert(
         'Google Sign-In Failed',
         'error' in result ? result.error : 'Unknown error'
       );
@@ -69,100 +89,113 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }: LoginProps) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        {/* App Logo */}
-        <View style={styles.logoContainer}>
-          <View style={styles.logoPlaceholder}>
-            <Text style={styles.logoText}>C12</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+        <View style={styles.content}>
+          {/* App Logo */}
+          <View style={styles.logoContainer}>
+            <View style={styles.logoPlaceholder}>
+              <Text style={styles.logoText}>C12</Text>
+            </View>
           </View>
-        </View>
 
-        {/* Title */}
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to your account</Text>
+          {/* Title */}
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Sign in to your account</Text>
 
-        {/* Form Fields */}
-        <View style={styles.formContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email Address"
-            value={formData.email}
-            onChangeText={value => handleInputChange('email', value)}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            placeholderTextColor="#999"
-            selectionColor="#333"
-          />
-
-          {/* Password Field with Eye Button */}
-          <View style={styles.passwordContainer}>
+          {/* Form Fields */}
+          <View style={styles.formContainer}>
             <TextInput
-              style={styles.passwordInput}
-              placeholder="Password"
-              value={formData.password}
-              onChangeText={value => handleInputChange('password', value)}
-              secureTextEntry={!showPassword}
-              textContentType="password"
+              style={styles.input}
+              placeholder="Email Address"
+              value={formData.email}
+              onChangeText={value => handleInputChange('email', value)}
+              keyboardType="email-address"
+              autoCapitalize="none"
               placeholderTextColor="#999"
               selectionColor="#333"
             />
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Image
-                source={
-                  showPassword
-                    ? require('../assets/icons/hide.png')
-                    : require('../assets/icons/view.png')
-                }
-                style={styles.eyeIcon}
-                resizeMode="contain"
+
+            {/* Password Field with Eye Button */}
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Password"
+                value={formData.password}
+                onChangeText={value => handleInputChange('password', value)}
+                secureTextEntry={!showPassword}
+                textContentType="password"
+                placeholderTextColor="#999"
+                selectionColor="#333"
               />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Image
+                  source={
+                    showPassword
+                      ? require('../assets/icons/hide.png')
+                      : require('../assets/icons/view.png')
+                  }
+                  style={styles.eyeIcon}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Login Button */}
+            <TouchableOpacity
+              style={[styles.loginButton, loading && styles.disabledButton]}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              <Text style={styles.loginButtonText}>
+                {loading ? 'Signing In...' : 'Sign In'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.divider} />
+            </View>
+
+            {/* Google Sign-In Button */}
+            <TouchableOpacity
+              style={styles.googleButton}
+              onPress={handleGoogleSignIn}
+              disabled={loading}
+            >
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
+            </TouchableOpacity>
+
+            {/* Switch to Register */}
+            <TouchableOpacity
+              style={styles.switchButton}
+              onPress={onSwitchToRegister}
+            >
+              <Text style={styles.switchText}>
+                Don't have an account?{' '}
+                <Text style={styles.switchLink}>Sign Up</Text>
+              </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Login Button */}
-          <TouchableOpacity
-            style={[styles.loginButton, loading && styles.disabledButton]}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.loginButtonText}>
-              {loading ? 'Signing In...' : 'Sign In'}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.divider} />
-          </View>
-
-          {/* Google Sign-In Button */}
-          <TouchableOpacity
-            style={styles.googleButton}
-            onPress={handleGoogleSignIn}
-            disabled={loading}
-          >
-            <Text style={styles.googleButtonText}>Continue with Google</Text>
-          </TouchableOpacity>
-
-          {/* Switch to Register */}
-          <TouchableOpacity
-            style={styles.switchButton}
-            onPress={onSwitchToRegister}
-          >
-            <Text style={styles.switchText}>
-              Don't have an account?{' '}
-              <Text style={styles.switchLink}>Sign Up</Text>
-            </Text>
-          </TouchableOpacity>
         </View>
-      </View>
-    </ScrollView>
+
+        <CustomAlert
+          visible={alert.visible}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+          onClose={hideAlert}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

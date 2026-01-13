@@ -17,7 +17,7 @@ class AuthService {
     email: string,
     password: string,
     userData: Omit<UserData, 'uid' | 'createdAt'>
-  ) {
+  ): Promise<{ success: boolean; user?: UserData; error?: string }> {
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
         email,
@@ -35,13 +35,16 @@ class AuthService {
       await firestore().collection('users').doc(user.uid).set(userDoc);
 
       return { success: true, user: userDoc };
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (error: any) {
+      return { success: false, error: this.getAuthErrorMessage(error.code) };
     }
   }
 
   // Login user with email and password
-  async loginUser(email: string, password: string) {
+  async loginUser(
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; user?: UserData; error?: string }> {
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
         email,
@@ -54,8 +57,35 @@ class AuthService {
       const userData = userDoc.data() as UserData;
 
       return { success: true, user: userData };
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (error: any) {
+      return { success: false, error: this.getAuthErrorMessage(error.code) };
+    }
+  }
+
+  private getAuthErrorMessage(errorCode: string): string {
+    switch (errorCode) {
+      case 'auth/invalid-credential':
+        return 'Invalid email or password. Please check your credentials and try again.';
+      case 'auth/user-not-found':
+        return 'No account found with this email address.';
+      case 'auth/wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'auth/invalid-email':
+        return 'Please enter a valid email address.';
+      case 'auth/user-disabled':
+        return 'This account has been disabled. Please contact support.';
+      case 'auth/too-many-requests':
+        return 'Too many failed attempts. Please try again later.';
+      case 'auth/network-request-failed':
+        return 'Network error. Please check your connection and try again.';
+      case 'auth/email-already-in-use':
+        return 'An account with this email already exists. Please use a different email or try logging in.';
+      case 'auth/weak-password':
+        return 'Password is too weak. Please use at least 6 characters.';
+      case 'auth/operation-not-allowed':
+        return 'Email/password accounts are not enabled. Please contact support.';
+      default:
+        return 'Authentication failed. Please try again.';
     }
   }
 

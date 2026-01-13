@@ -5,17 +5,21 @@ import SplashScreen from './src/components/SplashScreen';
 import Registration from './src/components/Registration';
 import Login from './src/components/Login';
 import Welcome from './src/components/Welcome';
+import OTPFlow from './src/components/OTPFlow';
 import AuthService from './src/services/AuthService';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isOTPVerified, setIsOTPVerified] = useState(false); // Start as true to skip OTP by default
   const [showLogin, setShowLogin] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     // Listen to authentication state changes
     const unsubscribe = AuthService.onAuthStateChanged(user => {
       setIsAuthenticated(!!user);
+      setCurrentUser(user);
     });
 
     return unsubscribe;
@@ -27,11 +31,17 @@ export default function App() {
 
   const handleAuthSuccess = () => {
     setIsAuthenticated(true);
+    setIsOTPVerified(false); // Reset OTP verification
+  };
+
+  const handleOTPVerified = () => {
+    setIsOTPVerified(true);
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setShowLogin(true); // Show login screen after logout
+    setIsOTPVerified(false);
+    setShowLogin(true);
   };
 
   const handleSwitchToLogin = () => {
@@ -46,10 +56,22 @@ export default function App() {
     return <SplashScreen onFinish={handleSplashFinish} />;
   }
 
-  if (isAuthenticated) {
+  if (isAuthenticated && !isOTPVerified) {
     return (
       <View style={styles.container}>
-        <Welcome onLogout={handleLogout} />
+        <OTPFlow
+          onOTPVerified={handleOTPVerified}
+          onBackToLogin={handleLogout}
+        />
+        <StatusBar style="auto" />
+      </View>
+    );
+  }
+
+  if (isAuthenticated && isOTPVerified) {
+    return (
+      <View style={styles.container}>
+        <Welcome onLogout={handleLogout} user={currentUser} />
         <StatusBar style="auto" />
       </View>
     );

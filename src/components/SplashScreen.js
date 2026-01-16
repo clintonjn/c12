@@ -3,18 +3,27 @@ import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 
 const SplashScreen = ({ onFinish }) => {
   const progressAnim = useRef(new Animated.Value(0)).current;
+  const hasFinished = useRef(false);
 
   useEffect(() => {
-    // Animate progress bar from 0 to 100% over 2.5 seconds
+    // Start the animation immediately
     Animated.timing(progressAnim, {
       toValue: 1,
-      duration: 2500,
+      duration: 4000,
       useNativeDriver: false,
     }).start(() => {
-      // Call onFinish when animation completes
-      onFinish();
+      // Only call onFinish once
+      if (!hasFinished.current) {
+        hasFinished.current = true;
+        onFinish();
+      }
     });
-  }, [progressAnim, onFinish]);
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      progressAnim.stopAnimation();
+    };
+  }, [onFinish, progressAnim]);
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, 1],
@@ -76,15 +85,16 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     width: '100%',
-    height: 4,
+    height: 6,
     backgroundColor: '#e0e0e0',
-    borderRadius: 2,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: '#333',
-    borderRadius: 2,
+    borderRadius: 3,
+    minWidth: 2, // Ensure minimum visibility
   },
 });
 

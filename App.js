@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { UserProvider } from './src/context/UserContext';
@@ -16,20 +16,22 @@ export default function App() {
   const [isOTPVerified, setIsOTPVerified] = useState(true); // Skip OTP by default for existing users
   const [showLogin, setShowLogin] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     // Listen to authentication state changes
     const unsubscribe = AuthService.onAuthStateChanged(user => {
       setIsAuthenticated(!!user);
       setCurrentUser(user);
+      setAuthReady(true); // Mark auth as ready
     });
 
     return unsubscribe;
   }, []);
 
-  const handleSplashFinish = () => {
+  const handleSplashFinish = useCallback(() => {
     setShowSplash(false);
-  };
+  }, []);
 
   const handleAuthSuccess = () => {
     setIsAuthenticated(true);
@@ -54,7 +56,13 @@ export default function App() {
     setShowLogin(false);
   };
 
+  // Always show splash screen first, regardless of auth state
   if (showSplash) {
+    return <SplashScreen onFinish={handleSplashFinish} />;
+  }
+
+  // Wait for auth to be ready before showing main app
+  if (!authReady) {
     return <SplashScreen onFinish={handleSplashFinish} />;
   }
 

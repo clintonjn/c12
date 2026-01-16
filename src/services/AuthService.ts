@@ -35,8 +35,12 @@ class AuthService {
       await firestore().collection('users').doc(user.uid).set(userDoc);
 
       return { success: true, user: userDoc };
-    } catch (error: any) {
-      return { success: false, error: this.getAuthErrorMessage(error.code) };
+    } catch (error: unknown) {
+      const authError = error as { code?: string };
+      return {
+        success: false,
+        error: this.getAuthErrorMessage(authError.code),
+      };
     }
   }
 
@@ -57,8 +61,12 @@ class AuthService {
       const userData = userDoc.data() as UserData;
 
       return { success: true, user: userData };
-    } catch (error: any) {
-      return { success: false, error: this.getAuthErrorMessage(error.code) };
+    } catch (error: unknown) {
+      const authError = error as { code?: string };
+      return {
+        success: false,
+        error: this.getAuthErrorMessage(authError.code),
+      };
     }
   }
 

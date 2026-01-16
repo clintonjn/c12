@@ -1,17 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { UserProvider } from './src/context/UserContext';
 import SplashScreen from './src/components/SplashScreen';
 import Registration from './src/components/Registration';
 import Login from './src/components/Login';
-import Welcome from './src/components/Welcome';
 import OTPFlow from './src/components/OTPFlow';
+import MainTabs from './src/navigation/MainTabs';
 import AuthService from './src/services/AuthService';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isOTPVerified, setIsOTPVerified] = useState(false); // Start as true to skip OTP by default
+  const [isOTPVerified, setIsOTPVerified] = useState(true); // Skip OTP by default for existing users
   const [showLogin, setShowLogin] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -70,10 +72,12 @@ export default function App() {
 
   if (isAuthenticated && isOTPVerified) {
     return (
-      <View style={styles.container}>
-        <Welcome onLogout={handleLogout} user={currentUser} />
-        <StatusBar style="auto" />
-      </View>
+      <UserProvider>
+        <NavigationContainer>
+          <MainTabs onLogout={handleLogout} user={currentUser} />
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </UserProvider>
     );
   }
 
